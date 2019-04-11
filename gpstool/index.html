@@ -66,10 +66,10 @@
        */
       function pollingProcess() {
         // 目標とする距離ステップ  [m]
-        const targetStepDistance = 300;
+        const targetStepDistance = 100;
 
         // ポーリング間隔の最大値および最小値 [ms]
-        const maxInterval = 90000;
+        const maxInterval = 40000;
         const minInterval = 10000;
 
         // Geolocation APIのオプション
@@ -85,7 +85,7 @@
           // ポーリング周期の決定
           const pollInterval = Math.max(
             Math.min(
-              (targetStepDistance / (positionObj.coords.speed + 0.00001)) *
+              (targetStepDistance / (positionObj.coords.speed + 0.000001)) *
                 1000,
               maxInterval
             ),
@@ -131,7 +131,7 @@
           pos.altitude + pos.altitudeAccuracy * 0.5
         );
         document.getElementById("currentAltitudeValue").textContent =
-          Math.round(pos.altitude * 100) / 100;
+          Math.round(pos.altitude * 10) / 10;
         document.getElementById("currentAltitudeErrorValue").textContent =
           Math.round(pos.altitudeAccuracy) * 0.5;
 
