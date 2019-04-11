@@ -69,8 +69,8 @@
         const targetStepDistance = 300;
 
         // ポーリング間隔の最大値および最小値 [ms]
-        const maxInterval = 90000;
-        const minInterval = 10000;
+        const maxInterval = 10000;
+        const minInterval = 2000;
 
         // Geolocation APIのオプション
         const geoOptions = {
@@ -97,7 +97,7 @@
         };
 
         const errorCallback = errObj => {
-          const errorRetryInterval = 120000;
+          const errorRetryInterval = maxInterval;
           setTimeout(pollingProcess, errorRetryInterval);
           positionError(errObj);
         };
@@ -294,11 +294,11 @@ document.getElementById("show_result").innerHTML = gl_text;
               currentDistance = 0.0;
               measureCount = 0;
               //ポーリング開始
-              setTimeout(pollingProcess, 10000);
+              setTimeout(pollingProcess, 5000);
             },
             errObj => {
               // 初期化処理のリトライ
-              const errorRetryInterval = 10000;
+              const errorRetryInterval = 5000;
               setTimeout(initializeGeolocationMeasurement, errorRetryInterval);
             }
           );
