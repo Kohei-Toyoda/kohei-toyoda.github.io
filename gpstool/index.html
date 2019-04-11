@@ -121,19 +121,19 @@
         const x = currentDistance;
 
 				altitudeLog.x.push(x);
-        altitudeLog.y.push(position.coords.altitude);
+        altitudeLog.y.push(pos.altitude);
         altitudeErrorLowLog.x.push(x);
         altitudeErrorLowLog.y.push(
-          position.coords.altitude - position.coords.altitudeAccuracy * 0.5
+          pos.altitude - pos.altitudeAccuracy * 0.5
         );
         altitudeErrorHighLog.x.push(x);
         altitudeErrorHighLog.y.push(
-          position.coords.altitude + position.coords.altitudeAccuracy * 0.5
+          pos.altitude + pos.altitudeAccuracy * 0.5
         );
         document.getElementById("currentAltitudeValue").textContent =
-          Math.round(position.coords.altitude * 100) / 100;
+          Math.round(pos.altitude * 100) / 100;
         document.getElementById("currentAltitudeErrorValue").textContent =
-          Math.round(position.coords.altitudeAccuracy) * 0.5;
+          Math.round(pos.altitudeAccuracy) * 0.5;
 
         Plotly.redraw("altitudeGraphDiv");
 
