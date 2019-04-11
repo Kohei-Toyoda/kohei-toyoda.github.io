@@ -69,8 +69,8 @@
         const targetStepDistance = 300;
 
         // ポーリング間隔の最大値および最小値 [ms]
-        const maxInterval = 10000;
-        const minInterval = 2000;
+        const maxInterval = 90000;
+        const minInterval = 10000;
 
         // Geolocation APIのオプション
         const geoOptions = {
@@ -298,7 +298,7 @@ document.getElementById("show_result").innerHTML = gl_text;
             },
             errObj => {
               // 初期化処理のリトライ
-              const errorRetryInterval = 5000;
+              const errorRetryInterval = 15000;
               setTimeout(initializeGeolocationMeasurement, errorRetryInterval);
             }
           );
