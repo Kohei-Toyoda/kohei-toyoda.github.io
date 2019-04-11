@@ -29,10 +29,10 @@
     <div id="show_result"></div>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
-      let currentDistance = -123456.7;
-      let previousLatLon = [-1234.5, -6789.01];
+      let currentDistance = 0.0;
+      let previousLatLon = [0, 0];
       let measureCount = 0;
-      const distanceStep = 0.03;
+      const distanceStepMin = 0.03;
 
       const altitudeLog = {
         x: [],
@@ -111,11 +111,37 @@
 
       function positionReceived(positionObj) {
         let pos = positionObj.coords;
-        const x = measureCount;
+        const distanseStep = getDistanceByLatLon(
+          previousLatLon[0],
+          previousLatLon[1],
+          pos.latitude,
+          pos.longitude
+        );
+				currentDistance += distanseStep;
+        const x = currentDistance;
+
+				altitudeLog.x.push(x);
+        altitudeLog.y.push(position.coords.altitude);
+        altitudeErrorLowLog.x.push(x);
+        altitudeErrorLowLog.y.push(
+          position.coords.altitude - position.coords.altitudeAccuracy * 0.5
+        );
+        altitudeErrorHighLog.x.push(x);
+        altitudeErrorHighLog.y.push(
+          position.coords.altitude + position.coords.altitudeAccuracy * 0.5
+        );
+        document.getElementById("currentAltitudeValue").textContent =
+          Math.round(position.coords.altitude * 100) / 100;
+        document.getElementById("currentAltitudeErrorValue").textContent =
+          Math.round(position.coords.altitudeAccuracy) * 0.5;
+
+        Plotly.redraw("altitudeGraphDiv");
+
+        previousLatLon = [pos.latitude, pos.longitude];
       }
 
       function positionError(errObj) {
-        alert("位置情報が取得できません。");
+        // 位置情報の取得に失敗
       }
 
       function resetAll() {
@@ -127,6 +153,8 @@
         altitudeErrorHighLog.x = [];
         altitudeErrorHighLog.y = [];
         Plotly.redraw("altitudeGraphDiv");
+        currentDistance = 0.0;
+        measureCount = 0;
       }
 
       /*
@@ -201,11 +229,11 @@ document.getElementById("show_result").innerHTML = gl_text;
       }
 
       /**
-			 * 初期化処理
-			 *
-			 * - Plotly.jsグラフ初期化
-			 * - 測定ポーリング開始
-			 */
+       * 初期化処理
+       *
+       * - Plotly.jsグラフ初期化
+       * - 測定ポーリング開始
+       */
       function initalize() {
         // 初回の位置情報を捨てておくと精度が上がりそうな気がする
         navigator.geolocation.getCurrentPosition(() => {}, () => {});
@@ -254,7 +282,34 @@ document.getElementById("show_result").innerHTML = gl_text;
         });
 
         document.getElementById("resetButton").onclick = resetAll;
-        pollingProcess();
+
+        // 位置取得機能の初期化およびポーリング開始
+        const initializeGeolocationMeasurement = () => {
+          navigator.geolocation.getCurrentPosition(
+            positionObj => {
+              previousLatLon = [
+                positionObj.coords.latitude,
+                positionObj.coords.longitude
+              ];
+              currentDistance = 0.0;
+              measureCount = 0;
+              //ポーリング開始
+              setTimeout(pollingProcess, 10000);
+            },
+            errObj => {
+              // 初期化処理のリトライ
+              const errorRetryInterval = 10000;
+              setTimeout(initializeGeolocationMeasurement, errorRetryInterval);
+            }
+          );
+        };
+
+        // GPSが安定するまで少し待ってから位置取得の初期化を行う (効果は謎)
+        const initializeGeolocationWaitMilliSeconds = 3000;
+        setTimeout(
+          initializeGeolocationMeasurement,
+          initializeGeolocationWaitMilliSeconds
+        );
       }
 
       window.onload = initalize;
